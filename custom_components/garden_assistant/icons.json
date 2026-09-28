@@ -1,0 +1,83 @@
+{
+  "entity": {
+    "sensor": {
+      "task_due_prune": {
+        "default": "mdi:content-cut"
+      },
+      "task_due_fertilize": {
+        "default": "mdi:bottle-tonic-plus"
+      },
+      "task_due_water": {
+        "default": "mdi:watering-can"
+      },
+      "task_due_harvest": {
+        "default": "mdi:basket"
+      },
+      "task_due_sow": {
+        "default": "mdi:sprout"
+      },
+      "task_due_protect": {
+        "default": "mdi:snowflake"
+      },
+      "task_due_custom": {
+        "default": "mdi:clipboard-check"
+      },
+      "next_task": {
+        "default": "mdi:flower"
+      },
+      "tasks_due": {
+        "default": "mdi:clipboard-list"
+      }
+    },
+    "binary_sensor": {
+      "needs_attention": {
+        "default": "mdi:flower",
+        "state": {
+          "on": "mdi:flower-poppy",
+          "off": "mdi:flower"
+        }
+      }
+    },
+    "button": {
+      "mark_done_prune": {
+        "default": "mdi:content-cut"
+      },
+      "mark_done_fertilize": {
+        "default": "mdi:bottle-tonic-plus"
+      },
+      "mark_done_water": {
+        "default": "mdi:watering-can"
+      },
+      "mark_done_harvest": {
+        "default": "mdi:basket"
+      },
+      "mark_done_sow": {
+        "default": "mdi:sprout"
+      },
+      "mark_done_protect": {
+        "default": "mdi:snowflake"
+      },
+      "mark_done_custom": {
+        "default": "mdi:clipboard-check"
+      }
+    },
+    "calendar": {
+      "garden_calendar": {
+        "default": "mdi:calendar"
+      }
+    },
+    "todo": {
+      "garden_tasks": {
+        "default": "mdi:clipboard-list"
+      }
+    }
+  },
+  "services": {
+    "complete_task": {
+      "service": "mdi:check-circle-outline"
+    },
+    "snooze_task": {
+      "service": "mdi:alarm-snooze"
+    }
+  }
+}

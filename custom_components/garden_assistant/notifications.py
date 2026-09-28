@@ -242,7 +242,7 @@ class GardenNotifier:
                 {"title": NOTIFICATION_TITLE, "message": message, "data": data},
                 blocking=True,
             )
-        except Exception:  # noqa: BLE001 - one broken service must not stop the rest
+        except Exception:
             _LOGGER.exception("Sending notification via notify.%s failed", service)
 
     # -------------------------------------------------------------- actions

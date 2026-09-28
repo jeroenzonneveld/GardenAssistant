@@ -13,17 +13,21 @@ Min HA version: **2025.4.0** (config subentries). Python 3.13, no external requi
 * **Plant subentry data** (`ConfigSubentry.data`):
   ```python
   {
-    "name": "Front rose",           # CONF_NAME
-    "preset": "rose",               # CONF_PRESET, key in plant_library.PLANT_LIBRARY or "custom"
-    "species": "Rosa 'Iceberg'",    # CONF_SPECIES (optional, "" allowed)
-    "location": "Front yard",       # CONF_LOCATION (optional)
-    "notes": "",                    # CONF_NOTES (optional)
-    "created": "2026-09-28",        # CONF_CREATED, ISO date, set on creation, kept on reconfigure
-    "tasks": {                      # CONF_TASKS; only task types with a schedule are present
-      "prune":     {"months": [2, 3], "interval_days": 0},
-      "fertilize": {"months": [4, 5, 6, 7], "interval_days": 28},
-      "custom":    {"months": [10], "interval_days": 0, "custom_task_name": "Remove suckers"},
-    },
+      "name": "Front rose",  # CONF_NAME
+      "preset": "rose",  # CONF_PRESET, key in plant_library.PLANT_LIBRARY or "custom"
+      "species": "Rosa 'Iceberg'",  # CONF_SPECIES (optional, "" allowed)
+      "location": "Front yard",  # CONF_LOCATION (optional)
+      "notes": "",  # CONF_NOTES (optional)
+      "created": "2026-09-28",  # CONF_CREATED, ISO date, set on creation, kept on reconfigure
+      "tasks": {  # CONF_TASKS; only task types with a schedule are present
+          "prune": {"months": [2, 3], "interval_days": 0},
+          "fertilize": {"months": [4, 5, 6, 7], "interval_days": 28},
+          "custom": {
+              "months": [10],
+              "interval_days": 0,
+              "custom_task_name": "Remove suckers",
+          },
+      },
   }
   ```
   Months are ints 1–12 and are **already in the user's hemisphere** (presets are defined

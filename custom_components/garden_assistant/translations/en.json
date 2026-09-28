@@ -1,0 +1,490 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up your garden",
+        "description": "Garden Assistant tracks recurring garden tasks. Add your plants afterwards with the \"Add plant\" button.",
+        "data": {
+          "hemisphere": "Hemisphere"
+        },
+        "data_description": {
+          "hemisphere": "Used to shift the built-in plant schedules to the right season. You can change this later in the options."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Garden Assistant is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Garden settings",
+        "data": {
+          "hemisphere": "Hemisphere",
+          "notify_enabled": "Send notifications",
+          "notify_services": "Notify services",
+          "notify_persistent": "Persistent notification",
+          "notify_time": "Notification time",
+          "lead_days": "Days in advance",
+          "repeat_daily": "Repeat daily until done",
+          "actionable_notifications": "Actionable notifications"
+        },
+        "data_description": {
+          "hemisphere": "Changing this does not change existing plants. Presets used for new plants are shifted by six months in the southern hemisphere.",
+          "notify_enabled": "Send one summary of due tasks each day. The garden_assistant_task_due event is always fired, also when this is off.",
+          "notify_services": "Notify services to send to, e.g. notify.mobile_app_pixel. You can type your own value.",
+          "notify_persistent": "Also create a persistent notification in Home Assistant.",
+          "notify_time": "Time of day the check runs and notifications are sent.",
+          "lead_days": "Also notify this many days before a task is due (0 = only on the due date).",
+          "repeat_daily": "Keep notifying every day until the task is marked as done.",
+          "actionable_notifications": "Add Done and Snooze buttons to mobile app notifications (one notification per task)."
+        }
+      }
+    }
+  },
+  "config_subentries": {
+    "plant": {
+      "entry_type": "Plant",
+      "initiate_flow": {
+        "user": "Add plant",
+        "reconfigure": "Reconfigure plant"
+      },
+      "step": {
+        "user": {
+          "title": "Add plant",
+          "data": {
+            "name": "Name",
+            "preset": "Plant type",
+            "species": "Species",
+            "location": "Location",
+            "notes": "Notes"
+          },
+          "data_description": {
+            "name": "What you call this plant, e.g. \"Front rose\".",
+            "preset": "Pre-fills the care schedule in the next step. Choose Custom to start empty.",
+            "species": "Optional, e.g. the variety or Latin name.",
+            "location": "Optional. Used as suggested area for the plant device.",
+            "notes": "Optional free text."
+          }
+        },
+        "reconfigure": {
+          "title": "Edit plant",
+          "data": {
+            "name": "Name",
+            "preset": "Plant type",
+            "species": "Species",
+            "location": "Location",
+            "notes": "Notes"
+          },
+          "data_description": {
+            "name": "What you call this plant, e.g. \"Front rose\".",
+            "preset": "Pre-fills the care schedule in the next step. Choose Custom to start empty.",
+            "species": "Optional, e.g. the variety or Latin name.",
+            "location": "Optional. Used as suggested area for the plant device.",
+            "notes": "Optional free text."
+          }
+        },
+        "schedule": {
+          "title": "Care schedule",
+          "description": "Set when each task is due. Leave a task empty to skip it. Months only: once per season. Interval only: every N days. Both: every N days during those months.",
+          "data": {
+            "prune_months": "Prune: months",
+            "prune_interval": "Prune: repeat every (days)",
+            "fertilize_months": "Fertilize: months",
+            "fertilize_interval": "Fertilize: repeat every (days)",
+            "water_months": "Water: months",
+            "water_interval": "Water: repeat every (days)",
+            "harvest_months": "Harvest: months",
+            "harvest_interval": "Harvest: repeat every (days)",
+            "sow_months": "Sow / plant: months",
+            "sow_interval": "Sow / plant: repeat every (days)",
+            "protect_months": "Winter protection: months",
+            "protect_interval": "Winter protection: repeat every (days)",
+            "custom_months": "Custom task: months",
+            "custom_interval": "Custom task: repeat every (days)",
+            "custom_task_name": "Custom task name"
+          },
+          "data_description": {
+            "prune_months": "Months in which this task is active (in your hemisphere).",
+            "prune_interval": "Repeat every N days; 0 = once per season.",
+            "fertilize_months": "Months in which this task is active (in your hemisphere).",
+            "fertilize_interval": "Repeat every N days; 0 = once per season.",
+            "water_months": "Months in which this task is active (in your hemisphere).",
+            "water_interval": "Repeat every N days; 0 = once per season.",
+            "harvest_months": "Months in which this task is active (in your hemisphere).",
+            "harvest_interval": "Repeat every N days; 0 = once per season.",
+            "sow_months": "Months in which this task is active (in your hemisphere).",
+            "sow_interval": "Repeat every N days; 0 = once per season.",
+            "protect_months": "Months in which this task is active (in your hemisphere).",
+            "protect_interval": "Repeat every N days; 0 = once per season.",
+            "custom_months": "Months in which this task is active (in your hemisphere).",
+            "custom_interval": "Repeat every N days; 0 = once per season.",
+            "custom_task_name": "Name of the custom task, e.g. \"Remove suckers\". Required when the custom task has a schedule."
+          }
+        }
+      },
+      "error": {
+        "name_required": "Please enter a name.",
+        "custom_task_name_required": "Enter a name for the custom task."
+      },
+      "abort": {
+        "entry_not_loaded": "The Garden Assistant integration must be loaded before you can add or change plants.",
+        "reconfigure_successful": "Plant updated."
+      }
+    }
+  },
+  "selector": {
+    "hemisphere": {
+      "options": {
+        "north": "Northern hemisphere",
+        "south": "Southern hemisphere"
+      }
+    },
+    "month": {
+      "options": {
+        "1": "January",
+        "2": "February",
+        "3": "March",
+        "4": "April",
+        "5": "May",
+        "6": "June",
+        "7": "July",
+        "8": "August",
+        "9": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "task_due_prune": {
+        "name": "Prune",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "task_due_fertilize": {
+        "name": "Fertilize",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "task_due_water": {
+        "name": "Water",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "task_due_harvest": {
+        "name": "Harvest",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "task_due_sow": {
+        "name": "Sow / plant",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "task_due_protect": {
+        "name": "Winter protection",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "task_due_custom": {
+        "name": "{name}",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Due",
+              "upcoming": "Upcoming",
+              "scheduled": "Scheduled",
+              "inactive": "Inactive"
+            }
+          },
+          "days_until": {
+            "name": "Days until due"
+          },
+          "last_done": {
+            "name": "Last done"
+          },
+          "snoozed_until": {
+            "name": "Snoozed until"
+          },
+          "months": {
+            "name": "Months"
+          },
+          "interval_days": {
+            "name": "Interval (days)"
+          }
+        }
+      },
+      "next_task": {
+        "name": "Next task",
+        "state_attributes": {
+          "task": {
+            "name": "Task"
+          },
+          "due": {
+            "name": "Due"
+          },
+          "days_until": {
+            "name": "Days until due"
+          }
+        }
+      },
+      "tasks_due": {
+        "name": "Tasks due",
+        "state_attributes": {
+          "tasks": {
+            "name": "Tasks"
+          }
+        }
+      }
+    },
+    "binary_sensor": {
+      "needs_attention": {
+        "name": "Needs attention",
+        "state_attributes": {
+          "due_tasks": {
+            "name": "Due tasks"
+          }
+        }
+      }
+    },
+    "button": {
+      "mark_done_prune": {
+        "name": "Mark done: Prune"
+      },
+      "mark_done_fertilize": {
+        "name": "Mark done: Fertilize"
+      },
+      "mark_done_water": {
+        "name": "Mark done: Water"
+      },
+      "mark_done_harvest": {
+        "name": "Mark done: Harvest"
+      },
+      "mark_done_sow": {
+        "name": "Mark done: Sow / plant"
+      },
+      "mark_done_protect": {
+        "name": "Mark done: Winter protection"
+      },
+      "mark_done_custom": {
+        "name": "Mark done: {name}"
+      }
+    },
+    "calendar": {
+      "garden_calendar": {
+        "name": "Garden calendar"
+      }
+    },
+    "todo": {
+      "garden_tasks": {
+        "name": "Garden tasks"
+      }
+    }
+  },
+  "services": {
+    "complete_task": {
+      "name": "Complete task",
+      "description": "Marks a garden task as done.",
+      "fields": {
+        "date": {
+          "name": "Date",
+          "description": "The date the task was done. Defaults to today."
+        }
+      }
+    },
+    "snooze_task": {
+      "name": "Snooze task",
+      "description": "Postpones a garden task by a number of days from today.",
+      "fields": {
+        "days": {
+          "name": "Days",
+          "description": "Number of days to postpone the task."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_entities": {
+      "message": "No task entities were targeted."
+    },
+    "not_garden_entity": {
+      "message": "{entity_id} is not a Garden Assistant entity."
+    },
+    "not_task_entity": {
+      "message": "{entity_id} is not a task entity. Use a task due sensor or a mark done button."
+    },
+    "entry_not_loaded": {
+      "message": "The Garden Assistant entry of {entity_id} is not loaded."
+    }
+  }
+}
