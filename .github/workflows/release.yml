@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  check-version:
+    name: Check manifest version matches tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare manifest version with release tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="$(jq -r '.version' custom_components/garden_assistant/manifest.json)"
+          tag="${TAG#v}"
+          echo "manifest version: ${version}"
+          echo "release tag:      ${tag}"
+          if [ "${version}" != "${tag}" ]; then
+            echo "::error::manifest.json version (${version}) does not match release tag (${tag})"
+            exit 1
+          fi

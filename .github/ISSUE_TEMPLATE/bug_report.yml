@@ -1,0 +1,48 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add a plant with preset ...
+        2. Set schedule ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2025.4.0"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Garden Assistant version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: hemisphere
+    attributes:
+      label: Hemisphere setting
+      options:
+        - North
+        - South
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and diagnostics
+      description: Relevant log lines (Settings > System > Logs). Remove personal information first.
+      render: text
