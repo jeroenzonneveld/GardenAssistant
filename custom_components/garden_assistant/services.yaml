@@ -1,0 +1,29 @@
+complete_task:
+  target:
+    entity:
+      integration: garden_assistant
+      domain:
+        - sensor
+        - button
+  fields:
+    date:
+      required: false
+      selector:
+        date:
+snooze_task:
+  target:
+    entity:
+      integration: garden_assistant
+      domain:
+        - sensor
+        - button
+  fields:
+    days:
+      required: false
+      default: 7
+      selector:
+        number:
+          min: 1
+          max: 365
+          unit_of_measurement: days
+          mode: box

@@ -1,0 +1,490 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Stel je tuin in",
+        "description": "Garden Assistant houdt terugkerende tuintaken bij. Voeg daarna je planten toe met de knop \"Plant toevoegen\".",
+        "data": {
+          "hemisphere": "Halfrond"
+        },
+        "data_description": {
+          "hemisphere": "Wordt gebruikt om de ingebouwde plantenschema's naar het juiste seizoen te verschuiven. Je kunt dit later wijzigen in de opties."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Garden Assistant is al ingesteld."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tuininstellingen",
+        "data": {
+          "hemisphere": "Halfrond",
+          "notify_enabled": "Meldingen versturen",
+          "notify_services": "Notify-services",
+          "notify_persistent": "Permanente melding",
+          "notify_time": "Tijdstip van melding",
+          "lead_days": "Dagen van tevoren",
+          "repeat_daily": "Dagelijks herhalen tot gedaan",
+          "actionable_notifications": "Meldingen met acties"
+        },
+        "data_description": {
+          "hemisphere": "Wijzigt bestaande planten niet. Voorinstellingen voor nieuwe planten worden op het zuidelijk halfrond zes maanden verschoven.",
+          "notify_enabled": "Stuur elke dag een samenvatting van taken die aan de beurt zijn. Het event garden_assistant_task_due wordt altijd afgevuurd, ook als dit uit staat.",
+          "notify_services": "Notify-services om naar te sturen, bijv. notify.mobile_app_pixel. Je kunt zelf een waarde typen.",
+          "notify_persistent": "Maak ook een permanente melding aan in Home Assistant.",
+          "notify_time": "Tijdstip waarop de controle draait en meldingen worden verstuurd.",
+          "lead_days": "Meld ook zoveel dagen voordat een taak aan de beurt is (0 = alleen op de dag zelf).",
+          "repeat_daily": "Blijf elke dag melden tot de taak als gedaan is gemarkeerd.",
+          "actionable_notifications": "Voeg knoppen Gedaan en Uitstellen toe aan meldingen in de mobiele app (een melding per taak)."
+        }
+      }
+    }
+  },
+  "config_subentries": {
+    "plant": {
+      "entry_type": "Plant",
+      "initiate_flow": {
+        "user": "Plant toevoegen",
+        "reconfigure": "Plant herconfigureren"
+      },
+      "step": {
+        "user": {
+          "title": "Plant toevoegen",
+          "data": {
+            "name": "Naam",
+            "preset": "Soort plant",
+            "species": "Soort",
+            "location": "Locatie",
+            "notes": "Notities"
+          },
+          "data_description": {
+            "name": "Hoe je deze plant noemt, bijv. \"Roos voortuin\".",
+            "preset": "Vult het verzorgingsschema in de volgende stap voor. Kies Eigen om leeg te beginnen.",
+            "species": "Optioneel, bijv. het ras of de Latijnse naam.",
+            "location": "Optioneel. Wordt gebruikt als voorgesteld gebied van het plantapparaat.",
+            "notes": "Optionele vrije tekst."
+          }
+        },
+        "reconfigure": {
+          "title": "Plant bewerken",
+          "data": {
+            "name": "Naam",
+            "preset": "Soort plant",
+            "species": "Soort",
+            "location": "Locatie",
+            "notes": "Notities"
+          },
+          "data_description": {
+            "name": "Hoe je deze plant noemt, bijv. \"Roos voortuin\".",
+            "preset": "Vult het verzorgingsschema in de volgende stap voor. Kies Eigen om leeg te beginnen.",
+            "species": "Optioneel, bijv. het ras of de Latijnse naam.",
+            "location": "Optioneel. Wordt gebruikt als voorgesteld gebied van het plantapparaat.",
+            "notes": "Optionele vrije tekst."
+          }
+        },
+        "schedule": {
+          "title": "Verzorgingsschema",
+          "description": "Stel in wanneer elke taak aan de beurt is. Laat een taak leeg om hem over te slaan. Alleen maanden: eenmaal per seizoen. Alleen interval: elke N dagen. Beide: elke N dagen binnen die maanden.",
+          "data": {
+            "prune_months": "Snoeien: maanden",
+            "prune_interval": "Snoeien: herhaal elke (dagen)",
+            "fertilize_months": "Bemesten: maanden",
+            "fertilize_interval": "Bemesten: herhaal elke (dagen)",
+            "water_months": "Water geven: maanden",
+            "water_interval": "Water geven: herhaal elke (dagen)",
+            "harvest_months": "Oogsten: maanden",
+            "harvest_interval": "Oogsten: herhaal elke (dagen)",
+            "sow_months": "Zaaien / planten: maanden",
+            "sow_interval": "Zaaien / planten: herhaal elke (dagen)",
+            "protect_months": "Winterbescherming: maanden",
+            "protect_interval": "Winterbescherming: herhaal elke (dagen)",
+            "custom_months": "Eigen taak: maanden",
+            "custom_interval": "Eigen taak: herhaal elke (dagen)",
+            "custom_task_name": "Naam eigen taak"
+          },
+          "data_description": {
+            "prune_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "prune_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "fertilize_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "fertilize_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "water_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "water_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "harvest_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "harvest_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "sow_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "sow_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "protect_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "protect_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "custom_months": "Maanden waarin deze taak actief is (op jouw halfrond).",
+            "custom_interval": "Herhaal elke N dagen; 0 = eenmaal per seizoen.",
+            "custom_task_name": "Naam van de eigen taak, bijv. \"Zuigers verwijderen\". Verplicht als de eigen taak een schema heeft."
+          }
+        }
+      },
+      "error": {
+        "name_required": "Voer een naam in.",
+        "custom_task_name_required": "Voer een naam in voor de eigen taak."
+      },
+      "abort": {
+        "entry_not_loaded": "De integratie Garden Assistant moet geladen zijn voordat je planten kunt toevoegen of wijzigen.",
+        "reconfigure_successful": "Plant bijgewerkt."
+      }
+    }
+  },
+  "selector": {
+    "hemisphere": {
+      "options": {
+        "north": "Noordelijk halfrond",
+        "south": "Zuidelijk halfrond"
+      }
+    },
+    "month": {
+      "options": {
+        "1": "Januari",
+        "2": "Februari",
+        "3": "Maart",
+        "4": "April",
+        "5": "Mei",
+        "6": "Juni",
+        "7": "Juli",
+        "8": "Augustus",
+        "9": "September",
+        "10": "Oktober",
+        "11": "November",
+        "12": "December"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "task_due_prune": {
+        "name": "Snoeien",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "task_due_fertilize": {
+        "name": "Bemesten",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "task_due_water": {
+        "name": "Water geven",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "task_due_harvest": {
+        "name": "Oogsten",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "task_due_sow": {
+        "name": "Zaaien / planten",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "task_due_protect": {
+        "name": "Winterbescherming",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "task_due_custom": {
+        "name": "{name}",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "status": {
+            "name": "Status",
+            "state": {
+              "due": "Nu",
+              "upcoming": "Binnenkort",
+              "scheduled": "Gepland",
+              "inactive": "Inactief"
+            }
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          },
+          "last_done": {
+            "name": "Laatst gedaan"
+          },
+          "snoozed_until": {
+            "name": "Uitgesteld tot"
+          },
+          "months": {
+            "name": "Maanden"
+          },
+          "interval_days": {
+            "name": "Interval (dagen)"
+          }
+        }
+      },
+      "next_task": {
+        "name": "Volgende taak",
+        "state_attributes": {
+          "task": {
+            "name": "Taak"
+          },
+          "due": {
+            "name": "Uiterlijk"
+          },
+          "days_until": {
+            "name": "Dagen tot uiterste datum"
+          }
+        }
+      },
+      "tasks_due": {
+        "name": "Taken te doen",
+        "state_attributes": {
+          "tasks": {
+            "name": "Taken"
+          }
+        }
+      }
+    },
+    "binary_sensor": {
+      "needs_attention": {
+        "name": "Heeft aandacht nodig",
+        "state_attributes": {
+          "due_tasks": {
+            "name": "Openstaande taken"
+          }
+        }
+      }
+    },
+    "button": {
+      "mark_done_prune": {
+        "name": "Afvinken: Snoeien"
+      },
+      "mark_done_fertilize": {
+        "name": "Afvinken: Bemesten"
+      },
+      "mark_done_water": {
+        "name": "Afvinken: Water geven"
+      },
+      "mark_done_harvest": {
+        "name": "Afvinken: Oogsten"
+      },
+      "mark_done_sow": {
+        "name": "Afvinken: Zaaien / planten"
+      },
+      "mark_done_protect": {
+        "name": "Afvinken: Winterbescherming"
+      },
+      "mark_done_custom": {
+        "name": "Afvinken: {name}"
+      }
+    },
+    "calendar": {
+      "garden_calendar": {
+        "name": "Kalender"
+      }
+    },
+    "todo": {
+      "garden_tasks": {
+        "name": "Taken"
+      }
+    }
+  },
+  "services": {
+    "complete_task": {
+      "name": "Taak afronden",
+      "description": "Markeert een tuintaak als gedaan.",
+      "fields": {
+        "date": {
+          "name": "Datum",
+          "description": "De datum waarop de taak is gedaan. Standaard vandaag."
+        }
+      }
+    },
+    "snooze_task": {
+      "name": "Taak uitstellen",
+      "description": "Stelt een tuintaak een aantal dagen vanaf vandaag uit.",
+      "fields": {
+        "days": {
+          "name": "Dagen",
+          "description": "Aantal dagen waarmee de taak wordt uitgesteld."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_entities": {
+      "message": "Er zijn geen taakentiteiten geselecteerd."
+    },
+    "not_garden_entity": {
+      "message": "{entity_id} is geen Garden Assistant-entiteit."
+    },
+    "not_task_entity": {
+      "message": "{entity_id} is geen taakentiteit. Gebruik een taaksensor of een knop om als gedaan te markeren."
+    },
+    "entry_not_loaded": {
+      "message": "De Garden Assistant-configuratie van {entity_id} is niet geladen."
+    }
+  }
+}
