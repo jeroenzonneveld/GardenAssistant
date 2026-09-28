@@ -1,27 +1,76 @@
 name: Release
 
+# Publishes a GitHub release (and tag) for the version in manifest.json as soon as
+# that version lands on main. Release notes come from the matching CHANGELOG.md section.
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
+    paths:
+      - custom_components/garden_assistant/manifest.json
+      - CHANGELOG.md
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  check-version:
-    name: Check manifest version matches tag
+  release:
+    name: Create release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Compare manifest version with release tag
-        env:
-          TAG: ${{ github.event.release.tag_name }}
+
+      - name: Read version
+        id: version
         run: |
           version="$(jq -r '.version' custom_components/garden_assistant/manifest.json)"
-          tag="${TAG#v}"
-          echo "manifest version: ${version}"
-          echo "release tag:      ${tag}"
-          if [ "${version}" != "${tag}" ]; then
-            echo "::error::manifest.json version (${version}) does not match release tag (${tag})"
+          if ! [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid manifest version '${version}'"
             exit 1
           fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the release exists
+        id: exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "Release ${TAG} already exists, nothing to do."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract release notes from CHANGELOG.md
+        if: steps.exists.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v v="${VERSION}" '
+            $0 ~ "^## \\[?" v "\\]?" { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::No CHANGELOG.md section found for version ${VERSION}"
+            exit 1
+          fi
+          cat release-notes.md
+
+      - name: Create release
+        if: steps.exists.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          gh release create "${TAG}" \
+            --target "${GITHUB_SHA}" \
+            --title "${TAG}" \
+            --notes-file release-notes.md \
+            --latest
