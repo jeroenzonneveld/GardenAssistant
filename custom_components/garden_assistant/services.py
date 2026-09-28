@@ -46,7 +46,11 @@ def _resolve_targets(
 ) -> list[tuple[GardenCoordinator, str, str]]:
     """Resolve the targeted entities to (coordinator, subentry_id, task)."""
     selected = async_extract_referenced_entity_ids(hass, call)
-    entity_ids = sorted(selected.referenced | selected.indirectly_referenced)
+    # Explicitly targeted entities must be task entities of this integration.
+    # Entities only reached through a device/area/label target are skipped
+    # silently when they are not (e.g. the next-task sensor of a plant device).
+    explicit = set(selected.referenced)
+    entity_ids = sorted(explicit | selected.indirectly_referenced)
     if not entity_ids:
         raise ServiceValidationError(
             translation_domain=DOMAIN, translation_key="no_entities"
@@ -57,6 +61,12 @@ def _resolve_targets(
     seen: set[tuple[str, str, str]] = set()
     for entity_id in entity_ids:
         reg_entry = registry.async_get(entity_id)
+        if entity_id not in explicit and (
+            reg_entry is None
+            or reg_entry.platform != DOMAIN
+            or _parse_unique_id(reg_entry.unique_id) is None
+        ):
+            continue
         if reg_entry is None or reg_entry.platform != DOMAIN:
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
@@ -92,6 +102,10 @@ def _resolve_targets(
             continue
         seen.add(key)
         result.append((coordinator, subentry_id, task))
+    if not result:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN, translation_key="no_entities"
+        )
     return result
 
 

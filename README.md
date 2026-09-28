@@ -79,14 +79,28 @@ Or manually:
 
 Global settings (hemisphere and notifications) are under **Configure** on the integration.
 
+### Plant presets
+
+Presets are a starting point for a temperate (north-west European) climate; adjust them to
+your local climate and variety. Available presets:
+
+Apple tree, Basil, Blueberry, Boxwood, Buddleja (butterfly bush), Cherry tree, Clematis,
+Courgette, Dahlia, Fig, Fuchsia, Grapevine, Hedge (beech / privet), Hydrangea (bigleaf),
+Lavender, Lawn, Lettuce, Mint, Olive tree (in pot), Ornamental grasses, Pear tree, Plum tree,
+Potato, Raspberry, Rhododendron, Rose, Rosemary, Runner bean, Strawberry, Thyme, Tomato,
+Tulip bulbs and Wisteria.
+
+Missing a plant? Open an issue or a pull request against
+`custom_components/garden_assistant/plant_library.py`.
+
 ### Entities
 
 For every plant, grouped in one device:
 
 | Entity | Description |
 |---|---|
-| `sensor` per task ("Prune due", ...) | Date the task is due next. Attributes: `task`, `status` (`due`, `upcoming`, `scheduled`, `inactive`), `days_until`, `last_done`, `snoozed_until`, `months`, `interval_days`. |
-| `button` per task ("Mark prune done", ...) | Press when you did the job. |
+| `sensor` per task ("Prune", ...) | Date the task is due next. Attributes: `task`, `status` (`due`, `upcoming`, `scheduled`, `inactive`), `days_until`, `last_done`, `snoozed_until`, `months`, `interval_days`. |
+| `button` per task ("Mark done: Prune", ...) | Press when you did the job. |
 | `sensor` "Next task" | Name of the next task with `task`, `due` and `days_until` attributes. |
 | `binary_sensor` "Needs attention" | On while at least one task is due. Attribute `due_tasks`. |
 
@@ -95,8 +109,8 @@ For the garden as a whole:
 | Entity | Description |
 |---|---|
 | `sensor` "Tasks due" | Number of tasks that are due right now, with a `tasks` attribute listing them. |
-| `calendar` "Garden calendar" | All-day events for every scheduled occurrence, for example "Prune: Front rose". |
-| `todo` "Garden tasks" | Due and upcoming tasks. Checking an item off marks the task as done. |
+| `calendar` "Calendar" | All-day events for every scheduled occurrence, for example "Prune: Front rose". |
+| `todo` "Tasks" | Due and upcoming tasks. Checking an item off marks the task as done. |
 
 ## How scheduling works
 
@@ -146,7 +160,6 @@ pushes its due date to at least the snooze date. It never makes a task due earli
 | `due` | The due date is today or in the past. |
 | `upcoming` | Due within the configured lead days. |
 | `scheduled` | Has a due date further in the future. |
-| `inactive` | No months and no interval configured. |
 
 ## Notifications
 
@@ -229,12 +242,16 @@ automation:
     actions:
       - action: garden_assistant.complete_task
         target:
-          entity_id: sensor.front_rose_prune_due
+          entity_id: sensor.front_rose_prune
         data:
           date: "{{ now().date() }}"
 ```
 
-The entity ids depend on your plant and task names; check them under
+Entity ids follow the plant name and task: `sensor.<plant>_<task>` (due date),
+`button.<plant>_mark_done_<task>`, `sensor.<plant>_next_task`,
+`binary_sensor.<plant>_needs_attention`, and for the garden `sensor.garden_tasks_due`,
+`calendar.garden_calendar` and `todo.garden_tasks`. Custom tasks use their own name, and
+Dutch installations get Dutch names. The exact ids depend on your plant and task names; check them under
 **Settings > Devices & services > Garden Assistant**.
 
 ## Lovelace example
@@ -243,19 +260,19 @@ The entity ids depend on your plant and task names; check them under
 type: vertical-stack
 cards:
   - type: todo-list
-    entity: todo.garden_garden_tasks
+    entity: todo.garden_tasks
     title: Garden tasks
   - type: calendar
     entities:
-      - calendar.garden_garden_calendar
+      - calendar.garden_calendar
     initial_view: listWeek
   - type: entities
     title: Front rose
     entities:
       - binary_sensor.front_rose_needs_attention
       - sensor.front_rose_next_task
-      - sensor.front_rose_prune_due
-      - button.front_rose_mark_prune_done
+      - sensor.front_rose_prune
+      - button.front_rose_mark_done_prune
 ```
 
 Adjust the entity ids to match your installation.
@@ -279,8 +296,9 @@ their stored months; reconfigure them to pick up the shifted values.
 In Home Assistant's `.storage` directory, next to the entry, not in the plant configuration.
 It is included in your regular Home Assistant backups.
 
-**Why is a task "inactive"?**
-Neither months nor an interval is set for it. Reconfigure the plant to add a schedule.
+**A task has no entities.**
+Tasks without months and without an interval are disabled and get no entities. Reconfigure
+the plant to add a schedule.
 
 **How do I get notified on my phone?**
 Enable notifications, add your `notify.mobile_app_<device>` service and turn on

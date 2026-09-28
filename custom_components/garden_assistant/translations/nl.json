@@ -442,12 +442,12 @@
     },
     "calendar": {
       "garden_calendar": {
-        "name": "Tuinkalender"
+        "name": "Kalender"
       }
     },
     "todo": {
       "garden_tasks": {
-        "name": "Tuintaken"
+        "name": "Taken"
       }
     }
   },

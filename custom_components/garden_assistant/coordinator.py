@@ -135,7 +135,8 @@ class GardenCoordinator(DataUpdateCoordinator[GardenData]):
         stored = await self._store.async_load()
         if isinstance(stored, dict) and isinstance(stored.get("plants"), dict):
             self._state = stored
-        self._prune_removed_plants()
+        if self._prune_removed_plants():
+            await self._store.async_save(self._state)
         self._unsub_midnight = async_track_time_change(
             self.hass, self._handle_midnight, hour=0, minute=0, second=5
         )
@@ -159,11 +160,14 @@ class GardenCoordinator(DataUpdateCoordinator[GardenData]):
             if sub.subentry_type == SUBENTRY_TYPE_PLANT
         }
 
-    def _prune_removed_plants(self) -> None:
+    def _prune_removed_plants(self) -> bool:
+        """Drop progress of plants that no longer exist; return True if changed."""
         known = set(self.plant_subentries())
         plants: dict[str, Any] = self._state["plants"]
-        for sid in [s for s in plants if s not in known]:
+        removed = [sid for sid in plants if sid not in known]
+        for sid in removed:
             plants.pop(sid)
+        return bool(removed)
 
     def _task_state(self, subentry_id: str, task: str) -> dict[str, Any]:
         plant = self._state["plants"].setdefault(subentry_id, {})
@@ -279,11 +283,6 @@ class GardenCoordinator(DataUpdateCoordinator[GardenData]):
             raise KeyError(f"Unknown plant {subentry_id}")
         if task not in TASK_TYPES:
             raise KeyError(f"Unknown task {task}")
-
-    async def async_remove_plant_state(self, subentry_id: str) -> None:
-        """Forget stored progress of a removed plant."""
-        if self._state["plants"].pop(subentry_id, None) is not None:
-            await self._store.async_save(self._state)
 
     async def async_remove_store(self) -> None:
         """Delete the store (entry removed)."""
