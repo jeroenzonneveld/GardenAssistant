@@ -1,0 +1,14 @@
+{
+  "domain": "garden_assistant",
+  "name": "Garden Assistant",
+  "codeowners": ["@jeroenzonneveld"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jeroenzonneveld/GardenAssistant",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/jeroenzonneveld/GardenAssistant/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}
