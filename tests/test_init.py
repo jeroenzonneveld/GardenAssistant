@@ -19,7 +19,13 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.util import dt as dt_util
 
-from .conftest import ROSE_SUBENTRY_ID, TOMATO_SUBENTRY_ID, make_entry, setup_entry
+from .conftest import (
+    ROSE_SUBENTRY_ID,
+    TOMATO_SUBENTRY_ID,
+    get_device,
+    make_entry,
+    setup_entry,
+)
 
 STORE_KEY = "garden_assistant.state.garden_entry"
 
@@ -79,22 +85,19 @@ async def test_entities_attached_to_subentries_and_devices(
     hass: HomeAssistant, init_integration: MockConfigEntry
 ) -> None:
     registry = er.async_get(hass)
-    devices = dr.async_get(hass)
 
     prune = registry.async_get("sensor.front_rose_prune")
     assert prune.config_subentry_id == ROSE
     garden_sensor = registry.async_get("sensor.garden_tasks_due")
     assert garden_sensor.config_subentry_id is None
 
-    rose_device = devices.async_get_device(identifiers={(DOMAIN, ROSE)})
+    rose_device = get_device(hass, ROSE)
     assert rose_device.name == "Front rose"
     assert rose_device.model == "Rosa 'Iceberg'"
     assert rose_device.entry_type is dr.DeviceEntryType.SERVICE
-    tomato_device = devices.async_get_device(identifiers={(DOMAIN, TOMATO)})
+    tomato_device = get_device(hass, TOMATO)
     assert tomato_device.model == "custom"
-    garden_device = devices.async_get_device(
-        identifiers={(DOMAIN, init_integration.entry_id)}
-    )
+    garden_device = get_device(hass, init_integration.entry_id)
     assert garden_device.name == "Garden"
 
 
@@ -448,7 +451,7 @@ async def test_complete_task_service_multiple_and_button_targets(
 async def test_complete_task_service_via_device_target(
     hass: HomeAssistant, init_integration: MockConfigEntry
 ) -> None:
-    device = dr.async_get(hass).async_get_device(identifiers={(DOMAIN, TOMATO)})
+    device = get_device(hass, TOMATO)
     await hass.services.async_call(
         DOMAIN, "complete_task", {"device_id": device.id}, blocking=True
     )
@@ -657,9 +660,8 @@ async def test_removing_subentry_removes_entities_and_device(
     }
     assert hass.states.get("sensor.front_rose_prune") is None
     assert hass.states.get("binary_sensor.front_rose_needs_attention") is None
-    devices = dr.async_get(hass)
-    assert devices.async_get_device(identifiers={(DOMAIN, ROSE)}) is None
-    assert devices.async_get_device(identifiers={(DOMAIN, TOMATO)}) is not None
+    assert get_device(hass, ROSE) is None
+    assert get_device(hass, TOMATO) is not None
     assert init_integration.state is ConfigEntryState.LOADED
     assert state_of(hass, "sensor.garden_tasks_due").state == "0"
 
@@ -716,9 +718,7 @@ async def test_button_press_error_becomes_ha_error(
 async def test_device_target_without_task_entities(
     hass: HomeAssistant, init_integration: MockConfigEntry
 ) -> None:
-    garden = dr.async_get(hass).async_get_device(
-        identifiers={(DOMAIN, init_integration.entry_id)}
-    )
+    garden = get_device(hass, init_integration.entry_id)
     with pytest.raises(ServiceValidationError) as err:
         await hass.services.async_call(
             DOMAIN, "complete_task", {"device_id": garden.id}, blocking=True

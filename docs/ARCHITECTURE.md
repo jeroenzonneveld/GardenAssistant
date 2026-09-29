@@ -1,7 +1,7 @@
 # Garden Assistant – architecture
 
 Home Assistant custom integration (domain `garden_assistant`), installable via HACS.
-Min HA version: **2025.4.0** (config subentries). Python 3.13, no external requirements.
+Min HA version: **2025.4.0** (config subentries). Python 3.13+ (HA 2026.9+ runs 3.14), no external requirements. Tests target the latest HA (Python 3.14).
 
 ## Concepts
 
