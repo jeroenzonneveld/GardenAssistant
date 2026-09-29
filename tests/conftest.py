@@ -137,3 +137,21 @@ def no_reload() -> Generator[None]:
     """Skip the real entry reload (for flow tests that only check results)."""
     with patch("homeassistant.config_entries.ConfigEntries.async_reload"):
         yield
+
+
+@pytest.fixture(autouse=True)
+def fail_on_deprecation_warnings(
+    caplog: pytest.LogCaptureFixture,
+) -> Generator[None]:
+    """Fail when Home Assistant reports deprecated API usage by this integration.
+
+    Deprecated helpers keep working until they are removed, so without this
+    check a removal in a newer Home Assistant release breaks installs silently.
+    """
+    yield
+    deprecations = [
+        record.getMessage()
+        for record in caplog.get_records("call")
+        if "deprecated" in record.getMessage() and DOMAIN in record.getMessage()
+    ]
+    assert not deprecations, deprecations
