@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Any
 
 import voluptuous as vol
 
@@ -10,7 +11,6 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv, entity_registry as er
-from homeassistant.helpers.service import async_extract_referenced_entity_ids
 
 from .const import (
     ATTR_DATE,
@@ -21,6 +21,32 @@ from .const import (
     TASK_TYPES,
 )
 from .coordinator import GardenCoordinator
+
+# Target extraction moved from helpers.service to helpers.target (HA 2025.7) and
+# the service-call based helper was removed in HA 2026.8. Support all versions.
+try:
+    from homeassistant.helpers.target import (
+        async_extract_referenced_entity_ids as _target_extract,
+    )
+
+    try:
+        from homeassistant.helpers.target import TargetSelection as _TargetSelection
+    except ImportError:  # HA < 2026.1
+        from homeassistant.helpers.target import (
+            TargetSelectorData as _TargetSelection,
+        )
+
+    def _extract_referenced(hass: HomeAssistant, call: ServiceCall) -> Any:
+        return _target_extract(hass, _TargetSelection(call.data))
+
+except ImportError:  # HA < 2025.7
+    from homeassistant.helpers.service import (
+        async_extract_referenced_entity_ids as _service_extract,
+    )
+
+    def _extract_referenced(hass: HomeAssistant, call: ServiceCall) -> Any:
+        return _service_extract(hass, call)
+
 
 COMPLETE_TASK_SCHEMA = cv.make_entity_service_schema({vol.Optional(ATTR_DATE): cv.date})
 SNOOZE_TASK_SCHEMA = cv.make_entity_service_schema(
@@ -45,7 +71,7 @@ def _resolve_targets(
     hass: HomeAssistant, call: ServiceCall
 ) -> list[tuple[GardenCoordinator, str, str]]:
     """Resolve the targeted entities to (coordinator, subentry_id, task)."""
-    selected = async_extract_referenced_entity_ids(hass, call)
+    selected = _extract_referenced(hass, call)
     # Explicitly targeted entities must be task entities of this integration.
     # Entities only reached through a device/area/label target are skipped
     # silently when they are not (e.g. the next-task sensor of a plant device).

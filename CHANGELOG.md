@@ -8,6 +8,19 @@ Releasing: bump `version` in `custom_components/garden_assistant/manifest.json`,
 section for it below and merge to `main`. The release workflow then creates the tag and
 the GitHub release.
 
+## [0.1.1] - 2026-09-29
+
+### Fixed
+
+- The integration failed to load on Home Assistant 2026.8 and newer ("Invalid handler
+  specified" when adding it), because it used a service helper that Home Assistant
+  removed. It now uses the new target helper and still works on older versions.
+
+### Changed
+
+- The test suite now fails on any deprecated Home Assistant API usage, so similar
+  breakage is caught before a Home Assistant release removes an API.
+
 ## [0.1.0] - 2026-09-28
 
 First public release of Garden Assistant: manage the plants in your garden and never
