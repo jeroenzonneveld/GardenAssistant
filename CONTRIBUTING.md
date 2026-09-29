@@ -5,7 +5,7 @@ Thanks for helping out! Bug reports, plant presets and pull requests are welcome
 ## Development setup
 
 ```bash
-python3.13 -m venv .venv
+python3.14 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements_test.txt
 ruff check . && ruff format --check .
