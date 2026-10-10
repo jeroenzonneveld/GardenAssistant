@@ -251,7 +251,7 @@ Entity ids follow the plant name and task: `sensor.<plant>_<task>` (due date),
 `button.<plant>_mark_done_<task>`, `sensor.<plant>_next_task`,
 `binary_sensor.<plant>_needs_attention`, and for the garden `sensor.garden_tasks_due`,
 `calendar.garden_calendar` and `todo.garden_tasks`. Custom tasks use their own name, and
-Dutch installations get Dutch names. The exact ids depend on your plant and task names; check them under
+Dutch installations get Dutch names, and since Home Assistant 2026.9 the area (the plant's location) is put in front, e.g. `sensor.front_yard_front_rose_prune`. The exact ids depend on your plant and task names; check them under
 **Settings > Devices & services > Garden Assistant**.
 
 ## Lovelace example
@@ -310,7 +310,7 @@ Issues and pull requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ```bash
-python3.13 -m venv .venv && source .venv/bin/activate
+python3.14 -m venv .venv && source .venv/bin/activate
 pip install -r requirements_test.txt
 ruff check . && ruff format --check . && pytest
 ```

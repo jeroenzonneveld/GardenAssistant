@@ -4,7 +4,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 3
   - package-ecosystem: pip
     directory: /
     schedule:
       interval: weekly
+    # Only propose releases that have been public for at least 3 days.
+    cooldown:
+      default-days: 3

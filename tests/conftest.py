@@ -17,7 +17,7 @@ from custom_components.garden_assistant.const import (
 )
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 TODAY = "2026-03-10 12:00:00+00:00"
 
@@ -98,9 +98,53 @@ def make_entry(
     )
 
 
+# Entity ids the tests refer to, keyed by (domain, unique_id). Home Assistant's
+# automatic entity id generation changes between releases (2026.9 started
+# prefixing the area name), so tests pin these ids in the registry up front.
+PINNED_ENTITY_IDS: dict[tuple[str, str], str] = {
+    (
+        "binary_sensor",
+        f"{ROSE_SUBENTRY_ID}_needs_attention",
+    ): "front_rose_needs_attention",
+    (
+        "binary_sensor",
+        f"{TOMATO_SUBENTRY_ID}_needs_attention",
+    ): "tomato_needs_attention",
+    ("button", f"{ROSE_SUBENTRY_ID}_prune_done"): "front_rose_mark_done_prune",
+    ("button", f"{ROSE_SUBENTRY_ID}_fertilize_done"): "front_rose_mark_done_fertilize",
+    ("button", f"{ROSE_SUBENTRY_ID}_custom_done"): (
+        "front_rose_mark_done_deadhead_spent_flowers"
+    ),
+    ("button", f"{TOMATO_SUBENTRY_ID}_water_done"): "tomato_mark_done_water",
+    ("sensor", f"{ROSE_SUBENTRY_ID}_prune_due"): "front_rose_prune",
+    ("sensor", f"{ROSE_SUBENTRY_ID}_fertilize_due"): "front_rose_fertilize",
+    ("sensor", f"{ROSE_SUBENTRY_ID}_custom_due"): "front_rose_deadhead_spent_flowers",
+    ("sensor", f"{ROSE_SUBENTRY_ID}_next_task"): "front_rose_next_task",
+    ("sensor", f"{TOMATO_SUBENTRY_ID}_water_due"): "tomato_water",
+    ("sensor", f"{TOMATO_SUBENTRY_ID}_next_task"): "tomato_next_task",
+}
+
+
+def _pin_entity_ids(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+    registry = er.async_get(hass)
+    for (domain, unique_id), object_id in PINNED_ENTITY_IDS.items():
+        subentry_id = unique_id.split("_", 2)[0] + "_subentry"
+        if subentry_id not in entry.subentries:
+            continue
+        registry.async_get_or_create(
+            domain,
+            DOMAIN,
+            unique_id,
+            suggested_object_id=object_id,
+            config_entry=entry,
+            config_subentry_id=subentry_id,
+        )
+
+
 async def setup_entry(hass: HomeAssistant, entry: MockConfigEntry) -> MockConfigEntry:
     """Add and set up an entry."""
     entry.add_to_hass(hass)
+    _pin_entity_ids(hass, entry)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
     return entry
@@ -155,3 +199,21 @@ def fail_on_deprecation_warnings(
         if "deprecated" in record.getMessage() and DOMAIN in record.getMessage()
     ]
     assert not deprecations, deprecations
+
+
+def get_device(hass: HomeAssistant, identifier: str) -> dr.DeviceEntry | None:
+    """Return the Garden Assistant device with the given identifier.
+
+    Home Assistant 2026.9 deprecated ``async_get_device(identifiers=...)`` in
+    favour of the per config entry ``async_get_device_by_identifier``.
+    """
+    registry = dr.async_get(hass)
+    if hasattr(registry, "async_get_device_by_identifier"):
+        entries = hass.config_entries.async_entries(DOMAIN)
+        for entry in entries:
+            if device := registry.async_get_device_by_identifier(
+                (DOMAIN, identifier), entry.entry_id
+            ):
+                return device
+        return None
+    return registry.async_get_device(identifiers={(DOMAIN, identifier)})
